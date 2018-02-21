@@ -6,8 +6,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D9;
+using SharpDX.DXGI;
+using SharpDX.DirectInput;
 
 namespace _3dedit {
     public class S4Trans {
@@ -93,7 +96,7 @@ namespace _3dedit {
         double R,R0;
         public bool m_changed;
         bool[] m_addMask;  // shift, ctrl, alt
-        Microsoft.DirectX.Matrix m_ViewMatr;
+        SharpDX.Matrix m_ViewMatr;
 
         public S4Camera(int dim,double _R) {
             Init(dim,_R);
@@ -105,7 +108,7 @@ namespace _3dedit {
         }
 
         void Init() {
-            m_ViewMatr=Microsoft.DirectX.Matrix.LookAtLH(new Vector3(0,0,0),new Vector3(0,0,-1),new Vector3(0,1,0));
+            m_ViewMatr=SharpDX.Matrix.LookAtLH(new Vector3(0,0,0),new Vector3(0,0,-1),new Vector3(0,1,0));
             R=R0;
             Trans=new S4Trans(Dim);
         }
@@ -141,7 +144,7 @@ namespace _3dedit {
             m_addMask=mask;
         }
 
-        public override void ProcessMouseMove(S3DirectX scene,EAction action,ETarget tg,Point pt,int DX,int DY,OnAction proc) {
+        public override void ProcessMouseMove(S3DirectX scene,EAction action,ETarget tg, System.Drawing.Point pt,int DX,int DY,OnAction proc) {
             /*
                         if(keys.qRightMouse){
              *              if(keys.qShift) _thisAction=EAction.ActionXYSlide; // WSlide, XY-rotate
@@ -213,7 +216,7 @@ namespace _3dedit {
             scene.SceneChanged=true;
         }
 
-        public override Microsoft.DirectX.Matrix GetViewMatrix() {
+        public override SharpDX.Matrix GetViewMatrix() {
             return m_ViewMatr;
         }
         public override void GetDynamicZRange(float zfar_ratio,out float RenderZnear,out float RenderZfar) {

@@ -4,7 +4,11 @@ using System.Drawing;
 using System.Collections;
 using System.IO;
 using System.Windows.Forms;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D9;
+using SharpDX.DXGI;
+using SharpDX.DirectInput;
 
 namespace _3dedit {
 	public class IDispModesComparer : IComparer {
@@ -43,9 +47,9 @@ namespace _3dedit {
 	public class D3DModeInfo {
 		public int			Width;      // Screen width in this mode
 		public int			Height;     // Screen height in this mode
-		public Format		Format;     // Pixel format in this mode
+		public SharpDX.Direct3D9.Format Format;     // Pixel format in this mode
 		public CreateFlags	dwBehavior; // Hardware / Software / Mixed vertex processing
-		public DepthFormat	DepthStencilFormat; // Which depth/stencil format to use with this mode
+        public DepthFormat	DepthStencilFormat; // Which depth/stencil format to use with this mode
 		public D3DModeInfo(){
 		}
 	};
@@ -56,7 +60,7 @@ namespace _3dedit {
 	//-----------------------------------------------------------------------------
 	public class D3DDeviceInfo {
 		// Device data
-		public Microsoft.DirectX.Direct3D.DeviceType DeviceType;      // Reference, HAL, etc.
+        public SharpDX.Direct3D9.DeviceType DeviceType;      // Reference, HAL, etc.
 		public DeviceCaps d3dCaps;         // Capabilities of this device
 		public string strDesc="";         // Name of this device
 		public bool bCanDoWindowed;  // Whether this device can work in windowed mode
@@ -71,8 +75,8 @@ namespace _3dedit {
 		// Current state
 		public int dwCurrentMode;
 		public bool bWindowed;
-		public MultiSampleType MultiSampleTypeWindowed;
-		public MultiSampleType MultiSampleTypeFullscreen;
+        public SharpDX.Direct3D9.MultisampleType MultiSampleTypeWindowed;
+		public SharpDX.Direct3D9.MultisampleType MultiSampleTypeFullscreen;
 	}
 	//-----------------------------------------------------------------------------
 	// Name: struct D3DAdapterInfo
@@ -106,8 +110,8 @@ namespace _3dedit {
 		// Main objects used for creating and rendering the 3D scene
 		//		protected DirectX8 m_dx8; // Used to create the Direct3D8
 		//		protected Direct3D8 m_pD3D; // Used to create the D3DDevice
-		protected Device m_pd3dDevice; // The D3D rendering device
-		public PresentParameters m_d3dpp;         // Parameters for CreateDevice/Reset
+		protected SharpDX.Direct3D11.Device m_pd3dDevice; // The D3D rendering device
+		public SharpDX.Direct3D9.PresentParameters m_d3dpp;         // Parameters for CreateDevice/Reset
 		protected Caps m_d3dCaps;           // Caps for the device
 		protected UserControl m_hWnd;              // The main app window
 		protected WCaptureLoss	m_win; //Native window
@@ -584,11 +588,11 @@ namespace _3dedit {
 		}
 
 		bool FindDepthStencilFormat(int iAdapter,
-			DeviceType DeviceType,
-			Format TargetFormat,
+            SharpDX.Direct3D9.DeviceType DeviceType,
+            SharpDX.Direct3D9.Format TargetFormat,
 			ref DepthFormat pDepthStencilFormat) {
-			//const int D3DUSAGE_RENDERTARGET = 1;
-			Usage D3DUSAGE_DEPTHSTENCIL = Usage.DepthStencil;
+            //const int D3DUSAGE_RENDERTARGET = 1;
+            SharpDX.Direct3D9.Usage D3DUSAGE_DEPTHSTENCIL = SharpDX.Direct3D9.Usage.DepthStencil;
 			if( m_dwMinDepthBits <= 16 && m_dwMinStencilBits == 0 ) {
 				if( Manager.CheckDeviceFormat( iAdapter, DeviceType,
 					TargetFormat, Usage.DepthStencil,
@@ -739,7 +743,7 @@ namespace _3dedit {
 				else if( pDeviceInfo.DeviceType == DeviceType.Software )
 					m_strDeviceStats="SW";
 
-				if( (((int)(pModeInfo.dwBehavior) & (int)CreateFlags.HardwareVertexProcessing)!= 0) &&
+                if( (((int)(pModeInfo.dwBehavior) & (int)SharpDX.Direct3D11.CreateFlags.HardwareVertexProcessing)!= 0) &&
 					(((int)(pModeInfo.dwBehavior) & (int)CreateFlags.PureDevice)!=0) ) {
 					if( pDeviceInfo.DeviceType == DeviceType.Hardware )
 						m_strDeviceStats+=" (pure hw vp)";
@@ -889,7 +893,7 @@ namespace _3dedit {
 			try {
 				m_pd3dDevice.TestCooperativeLevel();
 			}
-			catch(Microsoft.DirectX.DirectXException e) {
+            catch(Microsoft.DirectXException e) {
 				if(e is DeviceLostException)
 					return S_OK;
 				else if(e is DeviceNotResetException) {
@@ -969,7 +973,7 @@ namespace _3dedit {
 			FinalCleanup();
 		}
 		// Overridable functions for the 3D scene created by the app
-		public virtual int ConfirmDevice(DeviceCaps caps, CreateFlags createflg,Format fmt){
+		public virtual int ConfirmDevice(DeviceCaps caps, CreateFlags createflg, SharpDX.Direct3D9.Format fmt){
 			return S_OK;
 		}
 		virtual public int OneTimeSceneInit(){ return S_OK; }
@@ -992,7 +996,7 @@ namespace _3dedit {
 			String2Err(e.Message);
 		}
 
-		public Device	Renderer {
+		public SharpDX.Direct3D11.Device Renderer {
 			get	{	return m_pd3dDevice;	}
 		}
 	}

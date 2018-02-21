@@ -9,19 +9,22 @@ using System.Windows.Forms;
 using System.Data;
 using System.Runtime.InteropServices;
 
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using SharpDX.DirectInput;
 
 namespace _3dedit {
 	public enum FillMode{
-		POINT = Microsoft.DirectX.Direct3D.FillMode.Point,
-		WIREFRAME = Microsoft.DirectX.Direct3D.FillMode.WireFrame,
-		SOLID = Microsoft.DirectX.Direct3D.FillMode.Solid
+		POINT = SharpDX.Direct3D9.FillMode.Point,
+        WIREFRAME = SharpDX.Direct3D9.FillMode.Wireframe,
+		SOLID = SharpDX.Direct3D9.FillMode.Solid
 	}
 	public enum BFCullMode {
-		None = Microsoft.DirectX.Direct3D.Cull.None, // Do not cull back faces
-		CW = Microsoft.DirectX.Direct3D.Cull.Clockwise, // Cull back faces with clockwise vertices
-		CCW = Microsoft.DirectX.Direct3D.Cull.CounterClockwise // Cull back faces with counterclockwise vertices
+		None = SharpDX.Direct3D9.Cull.None, // Do not cull back faces
+		CW = SharpDX.Direct3D9.Cull.Clockwise, // Cull back faces with clockwise vertices
+        CCW = SharpDX.Direct3D9.Cull.Counterclockwise // Cull back faces with counterclockwise vertices
 	}
 
 	public enum ETarget{
@@ -185,28 +188,29 @@ namespace _3dedit {
         public Vector3 n;
         public int dc; //diffuse color
         public MYVERTEX(int dummy) { p = new Vector3(); n=new Vector3(); dc = 0; }
-		public static readonly VertexFormats Format = VertexFormats.Position | VertexFormats.Normal | VertexFormats.Diffuse;
+        public static readonly VertexFormats Format = VertexFormats.Position | VertexFormats.Normal | VertexFormats.Diffuse;
 	}
 
 	public class S3DirectX : DxBase {
 		Camera m_Camera = null;
         CameraLight m_Light = null;
-		Color m_bgColor = Color.FromArgb(255,0,0,0);
+        System.Drawing.Color m_bgColor = System.Drawing.Color.FromArgb(255,0,0,0);
 
-		Point m_lastPoint = new Point(0,0);
+        System.Drawing.Point m_lastPoint = new System.Drawing.Point(0,0);
 		EAction m_lastAction=EAction.Undef;
 
         FillMode m_RenderFillMode=FillMode.SOLID; //.WIREFRAME;
 		//++ vsv 08/07
 		BFCullMode m_BFCullMode = BFCullMode.None; // test, was: BFCullMode.CCW;
 
-		public Device DxDevice{ get{ return m_pd3dDevice; }}
+		public SharpDX.Direct3D11.Device DxDevice { get{ return m_pd3dDevice; }}
 		//
 
 
 
 
-		public Color BGColor{
+		public System.Drawing.Color BGColor
+        {
 			get{ return this.m_bgColor; }
 			set {
 				this.m_bgColor = value;
@@ -219,7 +223,7 @@ namespace _3dedit {
 			set {
 				m_RenderFillMode=value;
 				if(m_pd3dDevice != null) {
-					m_pd3dDevice.RenderState.FillMode = (Microsoft.DirectX.Direct3D.FillMode)value;
+					m_pd3dDevice.RenderState.FillMode = (SharpDX.Direct3D9.FillMode)value;
 					this.SceneChanged = true;
 				}
 			}
@@ -250,7 +254,7 @@ namespace _3dedit {
 			try{
 				// clear back buffer
 				m_pd3dDevice.Clear(
-					ClearFlags.Target | ClearFlags.ZBuffer,
+                    SharpDX.Direct3D9.ClearFlags.Target | SharpDX.Direct3D9.ClearFlags.ZBuffer,
 					m_bgColor,
 					1.0F,
 					0);
@@ -280,11 +284,11 @@ namespace _3dedit {
 			}
 		}
 
-		static public BaseMesh Create3DMesh(Device d3dDevice,int num_elems,MYVERTEX[] vertices,int num_index,ushort []indices){
-			Mesh pMesh = new Mesh(
+        static public SharpDX.Direct3D9.BaseMesh Create3DMesh(SharpDX.Direct3D11.Device d3dDevice,int num_elems,MYVERTEX[] vertices,int num_index,ushort []indices){
+			SharpDX.Direct3D9.Mesh pMesh = new SharpDX.Direct3D9.Mesh(
 				num_index/3,	// number of faces
 				num_elems,		// number of vertices
-				MeshFlags.Managed|MeshFlags.SystemMemory,  //options
+				SharpDX.Direct3D9.MeshFlags.Managed|SharpDX.Direct3D9.MeshFlags.SystemMemory,  //options
 				MYVERTEX.Format,
 				d3dDevice
 				);
@@ -310,7 +314,7 @@ namespace _3dedit {
 				pIndex[i] = indices[i];
 			}
 			pMesh.UnlockIndexBuffer();
-			return (BaseMesh)pMesh;
+			return (SharpDX.Direct3D9.BaseMesh)pMesh;
 		}
 
 		public void RePaint(){
@@ -321,16 +325,16 @@ namespace _3dedit {
 				SceneChanged = true;
 			}
 		}
-		public void		SetupObjectMaterial(Color color){
+		public void		SetupObjectMaterial(SharpDX.Color color){
 			// Set up a material. The material here just has the diffuse and ambient
 			// colors set to yellow. Note that only one material can be used at a time.
-			Material mtrl = new Material();
+			SharpDX.Direct3D9.Material mtrl = new SharpDX.Direct3D9.Material();
 			mtrl.Diffuse = color;
 				mtrl.Ambient = color;
 			m_pd3dDevice.Material = mtrl;
 		}
 
-		public void		SetupWorldMatrix(Microsoft.DirectX.Matrix  matr){
+		public void		SetupWorldMatrix(SharpDX.Matrix  matr){
 			m_pd3dDevice.SetTransform(TransformType.World, matr);
 		}
 
@@ -344,7 +348,7 @@ namespace _3dedit {
 		public void ProcessMouseMove(MouseEventArgs e, ETarget tg, IKeysProvider keys, OnAction proc) {
 			int CX = e.X;
 			int CY = e.Y;
-			Point _thisPoint = new Point(CX, CY);
+            System.Drawing.Point _thisPoint = new System.Drawing.Point(CX, CY);
 
 			if(!keys.qLeftMouse && !keys.qRightMouse){
 				m_lastAction=EAction.Undef; return;
@@ -383,7 +387,7 @@ namespace _3dedit {
 
 		public void ProcessMouseClick(MouseEventArgs e,ETarget tg, OnAction proc){
 			int x=e.X,y=e.Y;
-			Point pt=new Point(x,y);
+            System.Drawing.Point pt =new System.Drawing.Point(x,y);
 			IKeysProvider kk=new KeyboardState(e);
             EAction act;
 			bool ert=(e.Button==MouseButtons.Right);
@@ -401,8 +405,8 @@ namespace _3dedit {
 		public ushort height;
 
 
-		Microsoft.DirectX.Matrix	matProj;
-		public	Microsoft.DirectX.Matrix	matView;
+		SharpDX.Matrix	matProj;
+		public	SharpDX.Matrix	matView;
 		Viewport	Viewport = new Viewport();
 
 		public float zfar_ratio =10000;
@@ -415,7 +419,7 @@ namespace _3dedit {
 
 
 
-        public void BuildMatrices(Device pID3DDevice) {
+        public void BuildMatrices(SharpDX.Direct3D11.Device pID3DDevice) {
             matView=Camera.GetViewMatrix();
 
 			pID3DDevice.Transform.View = matView;
@@ -430,10 +434,10 @@ namespace _3dedit {
 
 			float aspect=((float)width)/((float)height);
 #if false
-            Microsoft.DirectX.Matrix matrix = Microsoft.DirectX.Matrix.PerspectiveFovLH(Camera.Angle,aspect,RenderZnear,RenderZfar);
+            SharpDX.Matrix matrix = SharpDX.Matrix.PerspectiveFovLH(Camera.Angle,aspect,RenderZnear,RenderZfar);
 #else
             float ang=Camera.Angle;
-            Microsoft.DirectX.Matrix matrix = Microsoft.DirectX.Matrix.OrthoLH(2*ang*aspect,2*ang,-100,100);
+            SharpDX.Matrix matrix = SharpDX.Matrix.OrthoLH(2*ang*aspect,2*ang,-100,100);
 
 #endif
 			pID3DDevice.Transform.Projection = matrix;
@@ -447,7 +451,7 @@ namespace _3dedit {
 			pID3DDevice.Viewport = Viewport;
 		}
 
-		public Vector3	ProjectPoint(Vector3 pt, Microsoft.DirectX.Matrix world) {
+		public Vector3	ProjectPoint(Vector3 pt, SharpDX.Matrix world) {
 			return	Vector3.Project(pt, 
 				Viewport,
 				matProj,
@@ -505,12 +509,12 @@ namespace _3dedit {
 			m_pd3dDevice.RenderState.PointScaleEnable = false;
 			float psz = 1.0f;
 			m_pd3dDevice.RenderState.PointSize = psz;
-			m_pd3dDevice.RenderState.FillMode = (Microsoft.DirectX.Direct3D.FillMode)m_RenderFillMode;
+			m_pd3dDevice.RenderState.FillMode = (SharpDX.Direct3D.FillMode)m_RenderFillMode;
 			m_pd3dDevice.RenderState.CullMode = (Cull)m_BFCullMode;
 
 			m_pd3dDevice.RenderState.AlphaBlendEnable = true;
-			m_pd3dDevice.RenderState.SourceBlend = Microsoft.DirectX.Direct3D.Blend.SourceAlpha;
-			m_pd3dDevice.RenderState.DestinationBlend = Microsoft.DirectX.Direct3D.Blend.InvSourceAlpha;
+			m_pd3dDevice.RenderState.SourceBlend = SharpDX.Direct3D.Blend.SourceAlpha;
+			m_pd3dDevice.RenderState.DestinationBlend = SharpDX.Direct3D.Blend.InvSourceAlpha;
 
 			m_pd3dDevice.RenderState.SpecularMaterialSource=ColorSource.Color1;
 			m_pd3dDevice.RenderState.SpecularEnable=true;

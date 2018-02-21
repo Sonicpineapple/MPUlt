@@ -2,8 +2,13 @@ using System;
 using System.Drawing;
 using System.Collections;
 using System.IO;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D9;
+using SharpDX.DXGI;
+using SharpDX.Mathematics;
+using SharpDX.DirectInput;
+using SharpDX.Windows;
 
 namespace _3dedit {
     class StkMesh {
@@ -321,7 +326,7 @@ namespace _3dedit {
             //SAxis=sa;
         }
         
-        public VertexBuffer GetNewBuffer(Device dev,int L) {
+        public VertexBuffer GetNewBuffer(SharpDX.Direct3D11.Device dev,int L) {
             VertexBuffer vbuf=null;
                 try {
                     vbuf = new VertexBuffer(typeof(CustomVertex.PositionNormalColored),L,dev,

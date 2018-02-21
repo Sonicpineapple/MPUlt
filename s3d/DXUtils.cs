@@ -2,8 +2,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using SharpDX.DirectInput;
 
 namespace _3dedit{
 	public class DXUtils{
@@ -16,7 +19,7 @@ namespace _3dedit{
 			return Vector3.Multiply(v1,v2);
 		}
 		public static void MulE(ref Vector3 v1, float v2) {
-			v1.Multiply(v2);
+            v1.Multiply(v2);
 		}
 		public static void MinusE(ref Vector3 v1, ref Vector3 v2) {
 			v1.Subtract(v2);
@@ -95,15 +98,15 @@ namespace _3dedit{
 			v *= fInvDet;
 			return true;
 		}
-		static public Microsoft.DirectX.Matrix CTrans2Matrix(CTrans ct) {
+		static public SharpDX.Matrix CTrans2Matrix(CTrans ct) {
 			Quaternion qRotation = new Quaternion();
 			qRotation.X = (float)-ct.R.X; qRotation.Y = (float)ct.R.Y; qRotation.Z = (float)ct.R.Z;
 			qRotation.W = (float)-ct.R.R;
-			Microsoft.DirectX.Matrix M = Microsoft.DirectX.Matrix.RotationQuaternion(qRotation);
+			SharpDX.Matrix M = SharpDX.Matrix.RotationQuaternion(qRotation);
 			M.M41 = (float)-ct.T.X; M.M42 = (float)ct.T.Y; M.M43 = (float)ct.T.Z;
 			return M;
 		}
-		static public CTrans Matrix2CTrans(Microsoft.DirectX.Matrix M) {
+		static public CTrans Matrix2CTrans(SharpDX.Matrix M) {
 			RPoint T = new RPoint(
 				-M.M41,
 				M.M42,

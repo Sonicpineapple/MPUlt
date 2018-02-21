@@ -10,8 +10,10 @@ using System.Timers;
 using System.Reflection;
 using System.Threading;
 using System.Runtime.InteropServices;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 
 
 namespace _3dedit

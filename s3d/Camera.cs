@@ -6,9 +6,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
-
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 namespace _3dedit{
 
 	public delegate	void OnPositionChangedHandler(Camera cam);
@@ -46,11 +47,11 @@ namespace _3dedit{
         public abstract void TargetTo(ref Vector3 pt);
         public abstract bool Park(ArrayList dxobj, ECameraPosition position, bool center);
         public abstract Vector3 GetLightVector();
-        public abstract void ProcessMouseMove(S3DirectX scene,EAction action,ETarget tg,Point pt,int DX,int DY,OnAction proc);
+        public abstract void ProcessMouseMove(S3DirectX scene,EAction action,ETarget tg, System.Drawing.Point pt,int DX,int DY,OnAction proc);
         public virtual CVTPoint GetCVTPoint(bool force) {
             return null; 
         }
-        public abstract Microsoft.DirectX.Matrix GetViewMatrix();
+        public abstract SharpDX.Matrix GetViewMatrix();
         public abstract void GetDynamicZRange(float zfar_ratio,out float RenderZnear,out float RenderZfar);
 
     }

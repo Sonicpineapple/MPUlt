@@ -8,8 +8,11 @@ using System.Reflection;
 using System.Data;
 using System.IO;
 
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using SharpDX.DirectInput;
 
 
 namespace _3dedit

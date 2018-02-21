@@ -1,8 +1,11 @@
 using System;
 using System.Drawing;
 
-using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D9;
+using SharpDX.DXGI;
+using SharpDX.DirectInput;
 
 namespace _3dedit {
 	/// <summary>
@@ -49,7 +52,7 @@ namespace _3dedit {
 			}
 		}
 
-		public void Setup(Device pID3DDevice, int n) {
+		public void Setup(SharpDX.Direct3D11.Device pID3DDevice, int n) {
 			if (m_bEnable) {
 				// Set up a white, directional light, with an oscillating direction.
 				// Note that many lights may be active at a time (but each one slows down
