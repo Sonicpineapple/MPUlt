@@ -1,0 +1,6 @@
+/home/luna/MPUlt source/MPUlt/obj/Debug/_3dedit.Form1.resources
+/home/luna/MPUlt source/MPUlt/obj/Debug/_3dedit.DXControl.resources
+/home/luna/MPUlt source/MPUlt/obj/Debug/_3dedit.TextDialog.resources
+/home/luna/MPUlt source/MPUlt/obj/Debug/MPUlt.csproj.GenerateResource.Cache
+/home/luna/MPUlt source/MPUlt/obj/Debug/MPUlt.csproj.CoreCompileInputs.cache
+/home/luna/MPUlt source/MPUlt/obj/Debug/MPUlt.csprojResolveAssemblyReference.cache
